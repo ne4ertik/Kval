@@ -1,0 +1,100 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+using System.Data.OleDb;
+
+
+namespace classnyugolok
+{ 
+
+
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                OleDbConnection conn = new System.Data.OleDb.OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.16.0;Data Source=.\school.accdb;");
+            conn.Open();
+            OleDbCommand cmd = new OleDbCommand("select * from Пользователи where Логин='" + textBox_login.Text + "' and Пароль='" + textBox_password.Text + "'", conn);
+            string login = textBox_login.Text;
+            string password = textBox_password.Text;
+            OleDbDataAdapter adapter = new OleDbDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+                try
+                {
+                    string cmbItemValue = comboBox1.SelectedItem.ToString();
+
+
+
+                    string role;
+                    string name;
+                    if (cmbItemValue == "Учитель")
+                    {
+                        role = "1";
+                    }
+                    else
+                    {
+                        role = "2";
+                    }
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        for (int i = 0; i < dt.Rows.Count; i++)
+                        {
+                            if (dt.Rows[i]["Роль_id"].ToString() == role)
+                            {
+                                MessageBox.Show("you are login as" + dt.Rows[i][2]);
+                                name = (string)dt.Rows[i][2];
+                                if (comboBox1.SelectedIndex == 0)
+                                {
+                                    Form2 form = new Form2(login, password, name);
+                                    form.Show();
+                                    this.Hide();
+
+                                }
+                                else if (comboBox1.SelectedIndex == 1)
+                                {
+                                    Form3 form3 = new Form3(login, password, name);
+
+                                    form3.Show(); this.Hide();
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        MessageBox.Show("Ошибка авторизации");
+                    }
+                }
+                catch { MessageBox.Show("Ошибка авторизации"); }
+
+                conn.Close(); }
+                
+            catch
+            {
+                MessageBox.Show("Error");
+            }
+        
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {  
+
+        }
+    }
+}
